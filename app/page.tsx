@@ -17,7 +17,6 @@ import {
   ChevronRight,
   Phone,
   Mail,
-
   ArrowRight,
   Check,
   Globe,
@@ -27,6 +26,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/AuthProvider";
+import { motion } from "framer-motion";
 
 const PACKAGES = [
   {
@@ -211,17 +211,41 @@ const TESTIMONIALS = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
 export default function Home() {
   const { user } = useAuth();
 
   return (
-    <main className="min-h-screen pt-16 selection:bg-purple-500/30">
+    <main className="min-h-screen pt-16 selection:bg-purple-500/30 overflow-hidden">
       <Navbar />
 
       {/* ═══════════════ HERO SECTION ═══════════════ */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
         {/* Background image */}
-        <div className="absolute inset-0">
+        <motion.div
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute inset-0"
+        >
           <Image
             src="/images/hero-party.png"
             alt="Luxury party celebration"
@@ -230,18 +254,31 @@ export default function Home() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/80 via-zinc-950/60 to-zinc-950" />
-        </div>
+        </motion.div>
 
         {/* Animated glow orbs */}
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[150px] animate-pulse pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-600/15 rounded-full blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: "1s" }} />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-600/15 rounded-full blur-[120px] animate-pulse pointer-events-none"
+          style={{ animationDelay: "1s" }}
+        />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10 w-full">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm text-zinc-300 mb-8 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm text-zinc-300 mb-8 backdrop-blur-sm"
+            >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span>Trusted by 10,000+ happy hosts worldwide</span>
-            </div>
+            </motion.div>
 
             <h1 className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight mb-8 leading-[0.9]">
               Book Your Next{" "}
@@ -257,7 +294,12 @@ export default function Home() {
               speechless.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
               {!user ? (
                 <div className="inline-block p-[1px] rounded-full bg-gradient-to-r from-purple-500 to-indigo-500">
                   <div className="bg-zinc-950 px-8 py-3.5 rounded-full flex items-center gap-2">
@@ -284,10 +326,15 @@ export default function Home() {
                 Explore Events
                 <ChevronRight className="w-4 h-4" />
               </a>
-            </div>
+            </motion.div>
 
             {/* Trust bar */}
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-zinc-500 text-sm">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+              className="mt-16 flex flex-wrap items-center justify-center gap-8 text-zinc-500 text-sm"
+            >
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-green-500" />
                 <span>Secure Payments</span>
@@ -300,14 +347,20 @@ export default function Home() {
                 <Clock className="w-4 h-4 text-amber-400" />
                 <span>24/7 Support</span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ STATS BAR ═══════════════ */}
       <section className="relative border-y border-white/5 bg-zinc-900/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: "10K+", label: "Parties Hosted" },
@@ -315,21 +368,27 @@ export default function Home() {
               { value: "98%", label: "Happy Clients" },
               { value: "6", label: "Countries" },
             ].map((stat, i) => (
-              <div key={i}>
+              <motion.div variants={itemVariants} key={i}>
                 <div className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-400">
                   {stat.value}
                 </div>
                 <div className="text-sm text-zinc-500 mt-1">{stat.label}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════════ SERVICES SECTION ═══════════════ */}
       <section className="py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
             <p className="text-sm font-semibold tracking-widest text-purple-400 uppercase mb-3">
               What We Offer
             </p>
@@ -339,13 +398,20 @@ export default function Home() {
                 Perfect Party
               </span>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {SERVICES.map((service, idx) => (
-              <div
+              <motion.div
+                variants={itemVariants}
                 key={idx}
-                className={`group relative rounded-2xl ${service.bg} border ${service.border} p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}
+                className={`group relative rounded-2xl ${service.bg} border ${service.border} p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]`}
               >
                 <div
                   className={`w-14 h-14 rounded-2xl ${service.bg} flex items-center justify-center mb-5 ${service.color}`}
@@ -358,16 +424,22 @@ export default function Home() {
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   {service.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ PARTY TYPES GALLERY ═══════════════ */}
       <section id="gallery" className="py-24 md:py-32 bg-zinc-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
             <p className="text-sm font-semibold tracking-widest text-amber-400 uppercase mb-3">
               Our Specialties
             </p>
@@ -377,11 +449,18 @@ export default function Home() {
                 Perfected
               </span>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid md:grid-cols-3 gap-6"
+          >
             {PARTY_TYPES.map((party, idx) => (
-              <div
+              <motion.div
+                variants={itemVariants}
                 key={idx}
                 className="group relative rounded-3xl overflow-hidden aspect-[4/5] cursor-pointer"
               >
@@ -403,17 +482,22 @@ export default function Home() {
                     Learn More <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ VENUE SHOWCASE ═══════════════ */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
               <p className="text-sm font-semibold tracking-widest text-emerald-400 uppercase mb-3">
                 Premium Venues
               </p>
@@ -436,12 +520,19 @@ export default function Home() {
                   "Lush garden estates with fairy light canopies",
                   "Beachside pavilions with ocean breezes",
                 ].map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: idx * 0.1 }}
+                    key={idx}
+                    className="flex items-center gap-3"
+                  >
                     <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
                     </div>
                     <span className="text-zinc-300">{feature}</span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
@@ -452,10 +543,17 @@ export default function Home() {
                 View All Venues
                 <ArrowRight className="w-4 h-4" />
               </Link>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl overflow-hidden aspect-[3/4]">
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="grid grid-cols-2 gap-4 relative"
+            >
+              <div className="absolute inset-0 bg-emerald-500/10 blur-[100px] rounded-full" />
+              <div className="rounded-2xl overflow-hidden aspect-[3/4] relative z-10">
                 <Image
                   src="/images/venue-indoor.png"
                   alt="Indoor venue"
@@ -464,7 +562,7 @@ export default function Home() {
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="rounded-2xl overflow-hidden aspect-[3/4] mt-8">
+              <div className="rounded-2xl overflow-hidden aspect-[3/4] mt-12 relative z-10">
                 <Image
                   src="/images/venue-outdoor.png"
                   alt="Outdoor venue"
@@ -473,7 +571,7 @@ export default function Home() {
                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -481,7 +579,13 @@ export default function Home() {
       {/* ═══════════════ PRICING SECTION ═══════════════ */}
       <section className="py-24 md:py-32 bg-zinc-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
             <p className="text-sm font-semibold tracking-widest text-purple-400 uppercase mb-3">
               Pricing
             </p>
@@ -495,11 +599,18 @@ export default function Home() {
               Transparent pricing with no hidden fees. Every package includes
               our dedicated party coordinator.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+          >
             {PACKAGES.map((pkg) => (
-              <div
+              <motion.div
+                variants={itemVariants}
                 key={pkg.id}
                 className={`relative group rounded-3xl bg-zinc-900 border ${
                   pkg.popular
@@ -545,22 +656,28 @@ export default function Home() {
                   href="/book"
                   className={`block w-full text-center py-3 rounded-full font-semibold transition-all duration-300 ${
                     pkg.popular
-                      ? `bg-gradient-to-r ${pkg.gradient} text-white hover:shadow-lg ${pkg.shadow}`
+                      ? `bg-gradient-to-r ${pkg.gradient} text-white hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]`
                       : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
                   }`}
                 >
                   Get Started
                 </Link>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ LOCATIONS SECTION ═══════════════ */}
       <section className="py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
             <p className="text-sm font-semibold tracking-widest text-sky-400 uppercase mb-3">
               Our Locations
             </p>
@@ -570,13 +687,20 @@ export default function Home() {
                 World
               </span>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"
+          >
             {LOCATIONS.map((loc, idx) => (
-              <div
+              <motion.div
+                variants={itemVariants}
                 key={idx}
-                className="group rounded-2xl bg-zinc-900/50 border border-white/5 p-6 text-center hover:border-sky-500/30 hover:bg-sky-500/5 transition-all duration-300 cursor-pointer"
+                className="group rounded-2xl bg-zinc-900/50 border border-white/5 p-6 text-center hover:border-sky-500/30 hover:bg-sky-500/5 transition-all duration-300 cursor-pointer hover:-translate-y-1"
               >
                 <div className="text-4xl mb-3">{loc.flag}</div>
                 <h4 className="font-bold text-white mb-1">{loc.city}</h4>
@@ -584,16 +708,22 @@ export default function Home() {
                   <MapPin className="w-3 h-3" />
                   {loc.venues} venues
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ TESTIMONIALS SECTION ═══════════════ */}
       <section className="py-24 md:py-32 bg-zinc-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
             <p className="text-sm font-semibold tracking-widest text-rose-400 uppercase mb-3">
               Testimonials
             </p>
@@ -603,13 +733,20 @@ export default function Home() {
                 Thousands
               </span>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid md:grid-cols-3 gap-8"
+          >
             {TESTIMONIALS.map((testimonial, idx) => (
-              <div
+              <motion.div
+                variants={itemVariants}
                 key={idx}
-                className="rounded-2xl bg-zinc-900 border border-white/5 p-8 hover:border-white/10 transition-all"
+                className="rounded-2xl bg-zinc-900 border border-white/5 p-8 hover:border-white/10 transition-all hover:scale-[1.02]"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
@@ -635,16 +772,22 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ═══════════════ CTA SECTION ═══════════════ */}
       <section className="py-24 md:py-32">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="relative rounded-3xl overflow-hidden p-12 md:p-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative rounded-3xl overflow-hidden p-12 md:p-20 shadow-2xl shadow-purple-900/20"
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-700" />
             <div className="absolute inset-0 bg-[url('/images/hero-party.png')] bg-cover bg-center opacity-10" />
             <div className="relative z-10">
@@ -658,13 +801,13 @@ export default function Home() {
               </p>
               <Link
                 href="/book"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-700 font-bold rounded-full hover:scale-105 transition-transform duration-300 shadow-2xl"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-700 font-bold rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]"
               >
                 <Calendar className="w-5 h-5" />
                 Start Planning Today
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
