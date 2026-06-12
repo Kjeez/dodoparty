@@ -49,6 +49,12 @@ export default function Navbar() {
                 >
                   Book Now
                 </Link>
+                <Link
+                  href="/dashboard"
+                  className="hidden md:inline-flex px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white border border-white/5 hover:border-white/10 rounded-full transition-all"
+                >
+                  My Bookings
+                </Link>
                 <div className="flex items-center gap-3 pl-4 border-l border-white/10">
                   <img
                     src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.displayName}`}
