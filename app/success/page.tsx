@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Order } from "@/types";
 import { CheckCircle2, XCircle, Loader2, PartyPopper } from "lucide-react";
 import Link from "next/link";
@@ -23,17 +22,18 @@ function SuccessContent() {
   const fetchOrder = useCallback(async () => {
     if (!orderId) return null;
 
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("id", orderId)
-      .single();
-
-    if (error) {
-      console.error("Error fetching order:", error);
+    try {
+      const res = await fetch(`/api/order?orderId=${orderId}`);
+      if (!res.ok) {
+        console.error("Error fetching order:", res.statusText);
+        return null;
+      }
+      const json = await res.json();
+      return json.order as Order;
+    } catch (err) {
+      console.error("Error fetching order:", err);
       return null;
     }
-    return data as Order;
   }, [orderId]);
 
   useEffect(() => {

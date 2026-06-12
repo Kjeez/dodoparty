@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Order } from "@/types";
 import Navbar from "@/components/Navbar";
 import { Loader2, CheckCircle2, XCircle, Clock, Calendar } from "lucide-react";
@@ -52,14 +51,14 @@ export default function DashboardPage() {
     if (!user) return;
 
     const fetchOrders = async () => {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("firebase_uid", user.uid)
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        setOrders(data as Order[]);
+      try {
+        const res = await fetch(`/api/order?firebaseUid=${user.uid}`);
+        if (res.ok) {
+          const json = await res.json();
+          setOrders((json.orders || []) as Order[]);
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
       }
       setFetching(false);
     };
