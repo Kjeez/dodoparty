@@ -11,23 +11,23 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("orderId");
+  const paymentId = searchParams.get("payment_id");
 
   const [order, setOrder] = useState<Order | null>(null);
   const [polling, setPolling] = useState(true);
   const [attempts, setAttempts] = useState(0);
+  const [verified, setVerified] = useState(false);
 
-  const MAX_POLL_ATTEMPTS = 20;
+  const MAX_POLL_ATTEMPTS = 15;
   const POLL_INTERVAL = 2000;
 
+  // Fetch order status from our API
   const fetchOrder = useCallback(async () => {
     if (!orderId) return null;
 
     try {
       const res = await fetch(`/api/order?orderId=${orderId}`);
-      if (!res.ok) {
-        console.error("Error fetching order:", res.statusText);
-        return null;
-      }
+      if (!res.ok) return null;
       const json = await res.json();
       return json.order as Order;
     } catch (err) {
@@ -36,42 +36,70 @@ function SuccessContent() {
     }
   }, [orderId]);
 
+  // Verify payment directly with Dodo API (fallback when webhook is slow)
+  const verifyPayment = useCallback(async () => {
+    if (!orderId || !paymentId || verified) return null;
+
+    try {
+      const res = await fetch("/api/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, paymentId }),
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json.verified) {
+        setVerified(true);
+      }
+      return json.order as Order;
+    } catch (err) {
+      console.error("Error verifying payment:", err);
+      return null;
+    }
+  }, [orderId, paymentId, verified]);
+
   useEffect(() => {
     if (!orderId) {
       router.push("/");
       return;
     }
 
-    const poll = async () => {
-      const data = await fetchOrder();
-      setOrder(data);
-      setAttempts((a) => a + 1);
+    let interval: NodeJS.Timeout;
+    let attemptCount = 0;
 
-      if (!data || data.status !== "pending") {
-        setPolling(false);
-        return;
+    const poll = async () => {
+      attemptCount++;
+      setAttempts(attemptCount);
+
+      // First try fetching the order
+      let data = await fetchOrder();
+
+      // If order is still pending and we have a payment_id, try verifying directly
+      if (data?.status === "pending" && paymentId && attemptCount >= 3) {
+        const verifiedOrder = await verifyPayment();
+        if (verifiedOrder) {
+          data = verifiedOrder;
+        }
       }
 
-      if (attempts >= MAX_POLL_ATTEMPTS) {
+      setOrder(data);
+
+      // Stop polling if order is no longer pending or max attempts reached
+      if (!data || data.status !== "pending" || attemptCount >= MAX_POLL_ATTEMPTS) {
         setPolling(false);
+        if (interval) clearInterval(interval);
       }
     };
 
+    // Initial fetch
     poll();
-    const interval = setInterval(async () => {
-      const data = await fetchOrder();
-      setOrder(data);
-      setAttempts((a) => {
-        const next = a + 1;
-        if (!data || data.status !== "pending" || next >= MAX_POLL_ATTEMPTS) {
-          setPolling(false);
-          clearInterval(interval);
-        }
-        return next;
-      });
-    }, POLL_INTERVAL);
 
-    return () => clearInterval(interval);
+    // Set up polling interval
+    interval = setInterval(poll, POLL_INTERVAL);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
@@ -128,12 +156,20 @@ function SuccessContent() {
               <span className="text-zinc-400 text-xs font-mono">{order.id.slice(0, 8)}...</span>
             </div>
           </div>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-full transition-colors"
-          >
-            Back to Home
-          </Link>
+          <div className="flex gap-4 justify-center">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-full transition-colors"
+            >
+              View My Bookings
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+            >
+              Back to Home
+            </Link>
+          </div>
         </div>
       );
     }
@@ -163,11 +199,16 @@ function SuccessContent() {
         <Loader2 className="w-16 h-16 text-yellow-400 mx-auto" />
         <h1 className="text-2xl font-bold text-white">Still processing...</h1>
         <p className="text-zinc-400 max-w-md mx-auto">
-          Your payment is taking longer than expected. Check your email for confirmation or contact support.
+          Your payment is taking longer than expected. Check your email for confirmation or visit your dashboard.
         </p>
-        <Link href="/" className="inline-flex items-center px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors">
-          Go Home
-        </Link>
+        <div className="flex gap-4 justify-center">
+          <Link href="/dashboard" className="inline-flex items-center px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-full transition-colors">
+            View My Bookings
+          </Link>
+          <Link href="/" className="inline-flex items-center px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors">
+            Go Home
+          </Link>
+        </div>
       </div>
     );
   };
