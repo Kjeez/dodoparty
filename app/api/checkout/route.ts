@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import DodoPayments from "dodopayments";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { PACKAGES } from "@/types";
 
 const client = new DodoPayments({

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Webhook } from "standardwebhooks";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 // Dodo sends webhooks signed with this secret
 // Get it from: Dodo Dashboard → Developer → Webhooks → your endpoint secret
